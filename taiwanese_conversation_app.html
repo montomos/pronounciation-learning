@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiwanese Chinese Conversation App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-tag {
+            padding: 10px 18px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-tag.active,
+        .filter-tag:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .conversation-results {
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .conversation-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 248, 248, 0.9));
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .conversation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .conversation-english {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .conversation-chinese {
+            font-size: 1.4em;
+            color: #e74c3c;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .conversation-pronunciation {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .conversation-scenario {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            margin-right: 10px;
+        }
+
+        .conversation-level {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .play-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-top: 40px;
+            padding: 50px 20px;
+        }
+
+        .total-count {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .speaking {
+            animation: pulse 1s infinite;
+        }
+
+        /* Level indicators */
+        .level-beginner { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .level-intermediate { background: rgba(255, 193, 7, 0.2); color: #FF9800; }
+        .level-advanced { background: rgba(244, 67, 54, 0.2); color: #F44336; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .filter-container {
+                justify-content: center;
+            }
+            
+            .conversation-card {
+                padding: 20px;
+            }
+            
+            .conversation-english {
+                font-size: 1.2em;
+            }
+            
+            .conversation-chinese {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.7em;
+            }
+            
+            .search-input {
+                padding: 12px 40px 12px 15px;
+                font-size: 14px;
+            }
+            
+            .conversation-english {
+                font-size: 1.1em;
+            }
+            
+            .conversation-chinese {
+                font-size: 1.2em;
+            }
+            
+            .filter-tag {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇹🇼 Taiwanese Chinese Conversation</h1>
+            <p class="subtitle">Learn daily conversations in Traditional Chinese with native Taiwanese pronunciation</p>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search conversations, scenarios, or Chinese phrases..." id="searchInput">
+            <button class="clear-btn" id="clearBtn">✕</button>
+        </div>
+
+        <div class="filter-container" id="filterContainer">
+            <!-- Filter tags will be dynamically generated -->
+        </div>
+
+        <div class="total-count" id="totalCount"></div>
+        <div class="conversation-results" id="conversationResults"></div>
+        
+        <div class="status" id="status">
+            Search for conversations and listen to authentic Taiwanese Chinese pronunciation!
+        </div>
+    </div>
+
+    <script>
+        // Taiwanese Chinese conversation database
+        const taiwaneseConversations = [
+            // Greetings & Basic Interactions
+            {
+                english: "Hello! How are you?",
+                chinese: "你好！你好嗎？",
+                pronunciation: "nǐ hǎo! nǐ hǎo ma?",
+                scenario: "Greetings",
+                level: "Beginner"
+            },
+            {
+                english: "Good morning!",
+                chinese: "早安！",
+                pronunciation: "zǎo ān!",
+                scenario: "Greetings",
+                level: "Beginner"
+            },
+            {
+                english: "Nice to meet you!",
+                chinese: "很高興認識你！",
+                pronunciation: "hěn gāo xìng rèn shí nǐ!",
+                scenario: "Greetings",
+                level: "Beginner"
+            },
+            {
+                english: "Thank you very much!",
+                chinese: "非常感謝！",
+                pronunciation: "fēi cháng gǎn xiè!",
+                scenario: "Greetings",
+                level: "Beginner"
+            },
+            {
+                english: "You're welcome!",
+                chinese: "不客氣！",
+                pronunciation: "bù kè qì!",
+                scenario: "Greetings",
+                level: "Beginner"
+            },
+
+            // Restaurant & Food
+            {
+                english: "I'd like to order this dish.",
+                chinese: "我想要點這道菜。",
+                pronunciation: "wǒ xiǎng yào diǎn zhè dào cài.",
+                scenario: "Restaurant",
+                level: "Beginner"
+            },
+            {
+                english: "Could I have the menu, please?",
+                chinese: "請給我菜單。",
+                pronunciation: "qǐng gěi wǒ cài dān.",
+                scenario: "Restaurant",
+                level: "Beginner"
+            },
+            {
+                english: "This is delicious!",
+                chinese: "這個很好吃！",
+                pronunciation: "zhè gè hěn hǎo chī!",
+                scenario: "Restaurant",
+                level: "Beginner"
+            },
+            {
+                english: "Could I have the bill, please?",
+                chinese: "請幫我結帳。",
+                pronunciation: "qǐng bāng wǒ jié zhàng.",
+                scenario: "Restaurant",
+                level: "Intermediate"
+            },
+            {
+                english: "I'm vegetarian.",
+                chinese: "我吃素。",
+                pronunciation: "wǒ chī sù.",
+                scenario: "Restaurant",
+                level: "Intermediate"
+            },
+
+            // Shopping
+            {
+                english: "How much does this cost?",
+                chinese: "這個多少錢？",
+                pronunciation: "zhè gè duō shǎo qián?",
+                scenario: "Shopping",
+                level: "Beginner"
+            },
+            {
+                english: "Can you give me a discount?",
+                chinese: "可以打折嗎？",
+                pronunciation: "kě yǐ dǎ zhé ma?",
+                scenario: "Shopping",
+                level: "Intermediate"
+            },
+            {
+                english: "I'm just looking around.",
+                chinese: "我只是看看。",
+                pronunciation: "wǒ zhǐ shì kàn kàn.",
+                scenario: "Shopping",
+                level: "Beginner"
+            },
+            {
+                english: "Do you have this in a different size?",
+                chinese: "有其他尺寸嗎？",
+                pronunciation: "yǒu qí tā chǐ cùn ma?",
+                scenario: "Shopping",
+                level: "Intermediate"
+            },
+            {
+                english: "I'll take this one.",
+                chinese: "我要這個。",
+                pronunciation: "wǒ yào zhè gè.",
+                scenario: "Shopping",
+                level: "Beginner"
+            },
+
+            // Transportation
+            {
+                english: "Where is the MRT station?",
+                chinese: "捷運站在哪裡？",
+                pronunciation: "jié yùn zhàn zài nǎ lǐ?",
+                scenario: "Transportation",
+                level: "Beginner"
+            },
+            {
+                english: "How do I get to Taipei 101?",
+                chinese: "怎麼去台北101？",
+                pronunciation: "zěn me qù tái běi yī líng yī?",
+                scenario: "Transportation",
+                level: "Intermediate"
+            },
+            {
+                english: "Please take me to the airport.",
+                chinese: "請帶我去機場。",
+                pronunciation: "qǐng dài wǒ qù jī chǎng.",
+                scenario: "Transportation",
+                level: "Intermediate"
+            },
+            {
+                english: "How long does it take?",
+                chinese: "要多久時間？",
+                pronunciation: "yào duō jiǔ shí jiān?",
+                scenario: "Transportation",
+                level: "Beginner"
+            },
+            {
+                english: "Stop here, please.",
+                chinese: "請在這裡停。",
+                pronunciation: "qǐng zài zhè lǐ tíng.",
+                scenario: "Transportation",
+                level: "Intermediate"
+            },
+
+            // Hotel
+            {
+                english: "I have a reservation.",
+                chinese: "我有預約。",
+                pronunciation: "wǒ yǒu yù yuē.",
+                scenario: "Hotel",
+                level: "Intermediate"
+            },
+            {
+                english: "Do you have any available rooms?",
+                chinese: "有空房間嗎？",
+                pronunciation: "yǒu kōng fáng jiān ma?",
+                scenario: "Hotel",
+                level: "Intermediate"
+            },
+            {
+                english: "What time is check-out?",
+                chinese: "幾點退房？",
+                pronunciation: "jǐ diǎn tuì fáng?",
+                scenario: "Hotel",
+                level: "Intermediate"
+            },
+            {
+                english: "Could you call a taxi for me?",
+                chinese: "可以幫我叫計程車嗎？",
+                pronunciation: "kě yǐ bāng wǒ jiào jì chéng chē ma?",
+                scenario: "Hotel",
+                level: "Advanced"
+            },
+
+            // Tourist Attractions
+            {
+                english: "Where can I buy tickets?",
+                chinese: "在哪裡可以買票？",
+                pronunciation: "zài nǎ lǐ kě yǐ mǎi piào?",
+                scenario: "Tourism",
+                level: "Intermediate"
+            },
+            {
+                english: "Can you take a photo for me?",
+                chinese: "可以幫我拍照嗎？",
+                pronunciation: "kě yǐ bāng wǒ pái zhào ma?",
+                scenario: "Tourism",
+                level: "Intermediate"
+            },
+            {
+                english: "What time does it open?",
+                chinese: "幾點開始營業？",
+                pronunciation: "jǐ diǎn kāi shǐ yíng yè?",
+                scenario: "Tourism",
+                level: "Intermediate"
+            },
+            {
+                english: "Is there a guided tour?",
+                chinese: "有導覽嗎？",
+                pronunciation: "yǒu dǎo lǎn ma?",
+                scenario: "Tourism",
+                level: "Advanced"
+            },
+
+            // Emergency
+            {
+                english: "Help! I need help!",
+                chinese: "救命！我需要幫助！",
+                pronunciation: "jiù mìng! wǒ xū yào bāng zhù!",
+                scenario: "Emergency",
+                level: "Beginner"
+            },
+            {
+                english: "I'm lost.",
+                chinese: "我迷路了。",
+                pronunciation: "wǒ mí lù le.",
+                scenario: "Emergency",
+                level: "Beginner"
+            },
+            {
+                english: "Please call the police.",
+                chinese: "請報警。",
+                pronunciation: "qǐng bào jǐng.",
+                scenario: "Emergency",
+                level: "Intermediate"
+            },
+            {
+                english: "I need to go to the hospital.",
+                chinese: "我需要去醫院。",
+                pronunciation: "wǒ xū yào qù yī yuàn.",
+                scenario: "Emergency",
+                level: "Intermediate"
+            },
+
+            // Daily Life
+            {
+                english: "What time is it?",
+                chinese: "現在幾點？",
+                pronunciation: "xiàn zài jǐ diǎn?",
+                scenario: "Daily Life",
+                level: "Beginner"
+            },
+            {
+                english: "What's the weather like today?",
+                chinese: "今天天氣如何？",
+                pronunciation: "jīn tiān tiān qì rú hé?",
+                scenario: "Daily Life",
+                level: "Intermediate"
+            },
+            {
+                english: "I don't understand.",
+                chinese: "我不懂。",
+                pronunciation: "wǒ bù dǒng.",
+                scenario: "Daily Life",
+                level: "Beginner"
+            },
+            {
+                english: "Could you speak slower?",
+                chinese: "可以說慢一點嗎？",
+                pronunciation: "kě yǐ shuō màn yī diǎn ma?",
+                scenario: "Daily Life",
+                level: "Intermediate"
+            },
+            {
+                english: "Where is the restroom?",
+                chinese: "廁所在哪裡？",
+                pronunciation: "cè suǒ zài nǎ lǐ?",
+                scenario: "Daily Life",
+                level: "Beginner"
+            },
+
+            // Business
+            {
+                english: "Nice to meet you. Here's my business card.",
+                chinese: "很高興認識您。這是我的名片。",
+                pronunciation: "hěn gāo xìng rèn shí nín. zhè shì wǒ de míng piàn.",
+                scenario: "Business",
+                level: "Advanced"
+            },
+            {
+                english: "Let's schedule a meeting.",
+                chinese: "我們安排個會議吧。",
+                pronunciation: "wǒ men ān pái gè huì yì ba.",
+                scenario: "Business",
+                level: "Advanced"
+            },
+            {
+                english: "Could you send me the documents?",
+                chinese: "可以把文件寄給我嗎？",
+                pronunciation: "kě yǐ bǎ wén jiàn jì gěi wǒ ma?",
+                scenario: "Business",
+                level: "Advanced"
+            }
+        ];
+
+        let filteredConversations = taiwaneseConversations;
+        let currentFilter = 'all';
+
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const conversationResults = document.getElementById('conversationResults');
+        const clearBtn = document.getElementById('clearBtn');
+        const totalCount = document.getElementById('totalCount');
+        const filterContainer = document.getElementById('filterContainer');
+        const status = document.getElementById('status');
+
+        // Speech synthesis setup
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // Initialize the app
+        function init() {
+            setupFilters();
+            displayResults(taiwaneseConversations);
+            updateTotalCount(taiwaneseConversations.length);
+        }
+
+        // Setup category filters
+        function setupFilters() {
+            const scenarios = ['all', ...new Set(taiwaneseConversations.map(c => c.scenario))];
+            
+            // Clear existing filters
+            filterContainer.innerHTML = '';
+
+            scenarios.forEach(scenario => {
+                const tag = document.createElement('span');
+                tag.className = 'filter-tag';
+                tag.dataset.scenario = scenario;
+                tag.textContent = scenario === 'all' ? 'All Scenarios' : scenario;
+                
+                if (scenario === currentFilter) {
+                    tag.classList.add('active');
+                }
+
+                tag.addEventListener('click', () => {
+                    currentFilter = scenario;
+                    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    filterAndDisplayResults();
+                });
+
+                filterContainer.appendChild(tag);
+            });
+        }
+
+        // Filter and display results
+        function filterAndDisplayResults() {
+            const query = searchInput.value.toLowerCase().trim();
+            
+            filteredConversations = taiwaneseConversations.filter(conversation => {
+                const matchesSearch = !query || 
+                    conversation.english.toLowerCase().includes(query) ||
+                    conversation.chinese.toLowerCase().includes(query) ||
+                    conversation.pronunciation.toLowerCase().includes(query) ||
+                    conversation.scenario.toLowerCase().includes(query);
+                
+                const matchesFilter = currentFilter === 'all' || conversation.scenario === currentFilter;
+                
+                return matchesSearch && matchesFilter;
+            });
+
+            displayResults(filteredConversations);
+            updateTotalCount(filteredConversations.length);
+        }
+
+        // Display conversation results
+        function displayResults(conversations) {
+            if (conversations.length === 0) {
+                conversationResults.innerHTML = `
+                    <div class="no-results">
+                        <div>😔</div>
+                        <div>No conversations found</div>
+                        <div style="font-size: 0.9em; margin-top: 10px;">Try adjusting your search terms or filters</div>
+                    </div>
+                `;
+                return;
+            }
+
+            conversationResults.innerHTML = conversations.map(conversation => `
+                <div class="conversation-card">
+                    <div class="conversation-english">${conversation.english}</div>
+                    <div class="conversation-chinese">${conversation.chinese}</div>
+                    <div class="conversation-pronunciation">Pronunciation: ${conversation.pronunciation}</div>
+                    <div class="conversation-scenario">${conversation.scenario}</div>
+                    <div class="conversation-level level-${conversation.level.toLowerCase()}">${conversation.level}</div>
+                    <div>
+                        <button class="play-button" onclick="speakChinese('${conversation.chinese}', this)">
+                            🔊 Play Taiwanese
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update total count display
+        function updateTotalCount(count) {
+            totalCount.textContent = `${count} conversations available`;
+        }
+
+        // Speak Chinese text with Taiwanese pronunciation
+        function speakChinese(chinese, button) {
+            if (!speechSynthesis) {
+                status.textContent = 'Your browser does not support speech synthesis';
+                return;
+            }
+
+            // Stop any existing speech
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+
+            // Update button states
+            const allButtons = document.querySelectorAll('.play-button');
+            allButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('speaking');
+                btn.innerHTML = '🔊 Play Taiwanese';
+            });
+
+            button.disabled = true;
+            button.classList.add('speaking');
+            button.innerHTML = '🔊 Speaking...';
+
+            // Create speech synthesis utterance
+            currentUtterance = new SpeechSynthesisUtterance(chinese);
+            currentUtterance.lang = 'zh-TW'; // Taiwanese Chinese
+            currentUtterance.rate = 0.8;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+
+            currentUtterance.onend = () => {
+                button.disabled = false;
+                button.classList.remove('speaking');
+                button.innerHTML = '🔊 Play Taiwanese';
+                currentUtterance = null;
+            };
+
+            currentUtterance.onerror = () => {
+                button.disabled = false;
+                button.classList.remove('speaking');
+                button.innerHTML = '🔊 Play Taiwanese';
+                status.textContent = 'Error occurred during speech playback';
+                currentUtterance = null;
+            };
+
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filterAndDisplayResults);
+        
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterAndDisplayResults();
+            searchInput.focus();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html> 
