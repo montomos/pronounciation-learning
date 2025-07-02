@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLLAMA Kids - Taiwan Chinese for 8-Year-Olds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 75%, #fdf2b3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: bgShift 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 75%, #fdf2b3 100%); }
+            100% { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 25%, #fed6e3 75%, #ffe8d6 100%); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 3px solid #ff6b6b;
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .tts-status {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid #4ecdc4;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            transform: scale(1.05);
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .word-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #ff6b6b;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .word-card.playing {
+            animation: pulse 0.6s ease-in-out;
+            border-color: #00d4aa;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .word-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .word-chinese {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+        }
+
+        .word-pinyin {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .word-english {
+            font-size: 0.85rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 3px solid #4ecdc4;
+        }
+
+        .stats-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .stats-content {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            z-index: 1000;
+            pointer-events: none;
+            animation: celebrate 1s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Games Section Styles */
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            padding: 8px;
+            border: 3px solid #ff6b6b;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: #666;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .practice-section {
+            display: none;
+        }
+
+        .practice-section.active {
+            display: block;
+        }
+
+        .games-section {
+            display: none;
+        }
+
+        .games-section.active {
+            display: block;
+        }
+
+        .game-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 248, 248, 0.95));
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #ff6b6b;
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .game-emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .game-description {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .game-interface {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 3px solid #4ecdc4;
+            display: none;
+        }
+
+        .game-interface.active {
+            display: block;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .game-back-btn {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .game-back-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .game-score {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .matching-game .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .option-card:hover {
+            transform: scale(1.05);
+            border-color: #ff6b6b;
+        }
+
+        .option-card.selected {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .option-card.correct {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option-card.incorrect {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+            animation: shake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .memory-game .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            cursor: not-allowed;
+        }
+
+        .quiz-game .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 3px solid #4ecdc4;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .question-audio {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .question-audio:hover {
+            transform: scale(1.05);
+        }
+
+        .speed-game .speed-interface {
+            text-align: center;
+        }
+
+        .speed-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .speed-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speed-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .speed-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .speed-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2.2rem; }
+            .word-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+            .word-card { padding: 15px; }
+            .word-emoji { font-size: 2rem; }
+            .word-chinese { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">OLLAMA Kids</h1>
+            <p class="subtitle">🇹🇼 Taiwan Travel Chinese for 8-Year-Olds! 🎉</p>
+        </div>
+
+        <div class="welcome-section">
+            <div class="welcome-text">
+                🌟 Click any button to hear perfect Chinese pronunciation! 🌟
+            </div>
+            <div class="welcome-text">
+                🎯 點任何按鈕聽標準中文發音！完美適合8歲小朋友！
+            </div>
+        </div>
+
+        <div class="tts-status" id="ttsStatus">
+            🔊 Free Chinese TTS Ready! No device language issues! 🇹🇼
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="practice">📚 Practice</button>
+            <button class="mode-btn" data-mode="games">🎮 Games</button>
+        </div>
+
+        <!-- Practice Section -->
+        <div class="practice-section active" id="practiceSection">
+            <div class="category-tabs">
+                <button class="tab-btn active" data-category="greetings">👋 Greetings</button>
+                <button class="tab-btn" data-category="food">🍜 Food</button>
+                <button class="tab-btn" data-category="family">👨‍👩‍👧‍👦 Family</button>
+                <button class="tab-btn" data-category="numbers">🔢 Numbers</button>
+                <button class="tab-btn" data-category="colors">🌈 Colors</button>
+                <button class="tab-btn" data-category="animals">🐻 Animals</button>
+                <button class="tab-btn" data-category="emotions">😊 Feelings</button>
+                <button class="tab-btn" data-category="travel">✈️ Travel</button>
+            </div>
+
+            <div class="word-grid" id="wordGrid">
+                <!-- Words will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Games Section -->
+        <div class="games-section" id="gamesSection">
+            <div class="game-selection" id="gameSelection">
+                <div class="game-card" data-game="matching">
+                    <span class="game-emoji">🎯</span>
+                    <div class="game-title">Phrase Matching</div>
+                    <div class="game-description">Match Chinese phrases with their English meanings!</div>
+                </div>
+                <div class="game-card" data-game="quiz">
+                    <span class="game-emoji">🎵</span>
+                    <div class="game-title">Audio Quiz</div>
+                    <div class="game-description">Listen to Chinese and choose the correct answer!</div>
+                </div>
+                <div class="game-card" data-game="memory">
+                    <span class="game-emoji">🧠</span>
+                    <div class="game-title">Memory Match</div>
+                    <div class="game-description">Find matching pairs of Chinese and English phrases!</div>
+                </div>
+                <div class="game-card" data-game="speed">
+                    <span class="game-emoji">⚡</span>
+                    <div class="game-title">Speed Challenge</div>
+                    <div class="game-description">Quick pronunciation practice against time!</div>
+                </div>
+            </div>
+
+            <!-- Matching Game Interface -->
+            <div class="game-interface matching-game" id="matchingGame">
+                <button class="game-back-btn" onclick="showGameSelection()">← Back to Games</button>
+                <div class="game-score" id="matchingScore">Score: 0 | Lives: ❤️❤️❤️</div>
+                <div class="game-header">
+                    <h3>🎯 Phrase Matching Game</h3>
+                    <p>Match the Chinese phrase with its English meaning!</p>
+                </div>
+                <div class="question-card">
+                    <div class="question-text" id="matchingQuestion">你好</div>
+                    <button class="question-audio" id="matchingAudio">🔊 Listen</button>
+                </div>
+                <div class="option-grid" id="matchingOptions"></div>
+                <button class="tab-btn" onclick="nextMatchingQuestion()" id="matchingNext" style="display:none;">Next Question →</button>
+            </div>
+
+            <!-- Quiz Game Interface -->
+            <div class="game-interface quiz-game" id="quizGame">
+                <button class="game-back-btn" onclick="showGameSelection()">← Back to Games</button>
+                <div class="game-score" id="quizScore">Score: 0 | Question: 1/10</div>
+                <div class="game-header">
+                    <h3>🎵 Audio Quiz Game</h3>
+                    <p>Listen carefully and choose the correct meaning!</p>
+                </div>
+                <div class="question-card">
+                    <button class="question-audio" id="quizAudio">🔊 Play Audio</button>
+                    <p>What does this Chinese phrase mean?</p>
+                </div>
+                <div class="option-grid" id="quizOptions"></div>
+                <button class="tab-btn" onclick="nextQuizQuestion()" id="quizNext" style="display:none;">Next Question →</button>
+            </div>
+
+            <!-- Memory Game Interface -->
+            <div class="game-interface memory-game" id="memoryGame">
+                <button class="game-back-btn" onclick="showGameSelection()">← Back to Games</button>
+                <div class="game-score" id="memoryScore">Pairs Found: 0/8 | Moves: 0</div>
+                <div class="game-header">
+                    <h3>🧠 Memory Match Game</h3>
+                    <p>Find matching pairs of Chinese phrases and English meanings!</p>
+                </div>
+                <div class="memory-grid" id="memoryGrid"></div>
+                <button class="tab-btn" onclick="resetMemoryGame()" id="memoryReset">🔄 New Game</button>
+            </div>
+
+            <!-- Speed Game Interface -->
+            <div class="game-interface speed-game" id="speedGame">
+                <button class="game-back-btn" onclick="showGameSelection()">← Back to Games</button>
+                <div class="game-score" id="speedScore">Score: 0 | Streak: 0</div>
+                <div class="speed-timer" id="speedTimer">60</div>
+                <div class="game-header">
+                    <h3>⚡ Speed Challenge</h3>
+                    <p>Listen and choose the correct meaning as fast as you can!</p>
+                </div>
+                <div class="speed-interface">
+                    <div class="speed-word" id="speedWord">Ready?</div>
+                    <button class="question-audio" id="speedAudio" style="display:none;">🔊 Play</button>
+                    <div class="speed-buttons" id="speedButtons">
+                        <button class="speed-btn" onclick="startSpeedGame()">🚀 Start Game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title">🏆 Your Learning Progress! 學習進度！</div>
+            <div class="stats-content">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalWords">0</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="wordsPlayed">0</div>
+                    <div class="stat-label">Words Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="currentStreak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Word database for 8-year-old kids traveling to Taiwan
+        const wordDatabase = {
+            greetings: [
+                { emoji: '👋', chinese: '你好', pinyin: 'nǐ hǎo', english: 'Hello' },
+                { emoji: '🌅', chinese: '早安', pinyin: 'zǎo ān', english: 'Good morning' },
+                { emoji: '🌙', chinese: '晚安', pinyin: 'wǎn ān', english: 'Good night' },
+                { emoji: '🙏', chinese: '謝謝', pinyin: 'xiè xiè', english: 'Thank you' },
+                { emoji: '🙇‍♂️', chinese: '對不起', pinyin: 'duì bù qǐ', english: 'Sorry' },
+                { emoji: '👋', chinese: '再見', pinyin: 'zài jiàn', english: 'Goodbye' },
+                { emoji: '🤝', chinese: '請', pinyin: 'qǐng', english: 'Please' },
+                { emoji: '😊', chinese: '不客氣', pinyin: 'bù kè qì', english: 'You\'re welcome' }
+            ],
+            food: [
+                { emoji: '🍜', chinese: '麵', pinyin: 'miàn', english: 'Noodles' },
+                { emoji: '🍚', chinese: '飯', pinyin: 'fàn', english: 'Rice' },
+                { emoji: '🥟', chinese: '餃子', pinyin: 'jiǎo zi', english: 'Dumplings' },
+                { emoji: '🧋', chinese: '珍珠奶茶', pinyin: 'zhēn zhū nǎi chá', english: 'Bubble tea' },
+                { emoji: '🍎', chinese: '蘋果', pinyin: 'píng guǒ', english: 'Apple' },
+                { emoji: '🍌', chinese: '香蕉', pinyin: 'xiāng jiāo', english: 'Banana' },
+                { emoji: '🥛', chinese: '牛奶', pinyin: 'niú nǎi', english: 'Milk' },
+                { emoji: '🍪', chinese: '餅乾', pinyin: 'bǐng gān', english: 'Cookies' },
+                { emoji: '🍦', chinese: '冰淇淋', pinyin: 'bīng qí lín', english: 'Ice cream' },
+                { emoji: '💧', chinese: '水', pinyin: 'shuǐ', english: 'Water' }
+            ],
+            family: [
+                { emoji: '👨', chinese: '爸爸', pinyin: 'bà ba', english: 'Daddy' },
+                { emoji: '👩', chinese: '媽媽', pinyin: 'mā ma', english: 'Mommy' },
+                { emoji: '👦', chinese: '哥哥', pinyin: 'gē ge', english: 'Big brother' },
+                { emoji: '👧', chinese: '姐姐', pinyin: 'jiě jie', english: 'Big sister' },
+                { emoji: '👶', chinese: '弟弟', pinyin: 'dì di', english: 'Little brother' },
+                { emoji: '👶', chinese: '妹妹', pinyin: 'mèi mei', english: 'Little sister' },
+                { emoji: '👴', chinese: '爺爺', pinyin: 'yé ye', english: 'Grandpa' },
+                { emoji: '👵', chinese: '奶奶', pinyin: 'nǎi nai', english: 'Grandma' }
+            ],
+            numbers: [
+                { emoji: '1️⃣', chinese: '一', pinyin: 'yī', english: 'One' },
+                { emoji: '2️⃣', chinese: '二', pinyin: 'èr', english: 'Two' },
+                { emoji: '3️⃣', chinese: '三', pinyin: 'sān', english: 'Three' },
+                { emoji: '4️⃣', chinese: '四', pinyin: 'sì', english: 'Four' },
+                { emoji: '5️⃣', chinese: '五', pinyin: 'wǔ', english: 'Five' },
+                { emoji: '6️⃣', chinese: '六', pinyin: 'liù', english: 'Six' },
+                { emoji: '7️⃣', chinese: '七', pinyin: 'qī', english: 'Seven' },
+                { emoji: '8️⃣', chinese: '八', pinyin: 'bā', english: 'Eight' },
+                { emoji: '9️⃣', chinese: '九', pinyin: 'jiǔ', english: 'Nine' },
+                { emoji: '🔟', chinese: '十', pinyin: 'shí', english: 'Ten' }
+            ],
+            colors: [
+                { emoji: '🔴', chinese: '紅色', pinyin: 'hóng sè', english: 'Red' },
+                { emoji: '🟡', chinese: '黃色', pinyin: 'huáng sè', english: 'Yellow' },
+                { emoji: '🔵', chinese: '藍色', pinyin: 'lán sè', english: 'Blue' },
+                { emoji: '🟢', chinese: '綠色', pinyin: 'lǜ sè', english: 'Green' },
+                { emoji: '🟣', chinese: '紫色', pinyin: 'zǐ sè', english: 'Purple' },
+                { emoji: '🟠', chinese: '橙色', pinyin: 'chéng sè', english: 'Orange' },
+                { emoji: '⚫', chinese: '黑色', pinyin: 'hēi sè', english: 'Black' },
+                { emoji: '⚪', chinese: '白色', pinyin: 'bái sè', english: 'White' }
+            ],
+            animals: [
+                { emoji: '🐶', chinese: '狗', pinyin: 'gǒu', english: 'Dog' },
+                { emoji: '🐱', chinese: '貓', pinyin: 'māo', english: 'Cat' },
+                { emoji: '🐻', chinese: '熊', pinyin: 'xióng', english: 'Bear' },
+                { emoji: '🐰', chinese: '兔子', pinyin: 'tù zi', english: 'Rabbit' },
+                { emoji: '🐸', chinese: '青蛙', pinyin: 'qīng wā', english: 'Frog' },
+                { emoji: '🐦', chinese: '鳥', pinyin: 'niǎo', english: 'Bird' },
+                { emoji: '🐟', chinese: '魚', pinyin: 'yú', english: 'Fish' },
+                { emoji: '🐘', chinese: '大象', pinyin: 'dà xiàng', english: 'Elephant' }
+            ],
+            emotions: [
+                { emoji: '😊', chinese: '開心', pinyin: 'kāi xīn', english: 'Happy' },
+                { emoji: '😢', chinese: '難過', pinyin: 'nán guò', english: 'Sad' },
+                { emoji: '😡', chinese: '生氣', pinyin: 'shēng qì', english: 'Angry' },
+                { emoji: '😴', chinese: '累', pinyin: 'lèi', english: 'Tired' },
+                { emoji: '😋', chinese: '餓', pinyin: 'è', english: 'Hungry' },
+                { emoji: '😵', chinese: '渴', pinyin: 'kě', english: 'Thirsty' },
+                { emoji: '🤒', chinese: '不舒服', pinyin: 'bù shū fú', english: 'Sick' },
+                { emoji: '😍', chinese: '喜歡', pinyin: 'xǐ huān', english: 'Like/Love' }
+            ],
+            travel: [
+                { emoji: '🚻', chinese: '廁所', pinyin: 'cè suǒ', english: 'Toilet' },
+                { emoji: '🏨', chinese: '飯店', pinyin: 'fàn diàn', english: 'Hotel' },
+                { emoji: '🚕', chinese: '計程車', pinyin: 'jì chéng chē', english: 'Taxi' },
+                { emoji: '🚇', chinese: '捷運', pinyin: 'jié yùn', english: 'MRT' },
+                { emoji: '🏪', chinese: '便利商店', pinyin: 'biàn lì shāng diàn', english: 'Convenience store' },
+                { emoji: '🆘', chinese: '幫忙', pinyin: 'bāng máng', english: 'Help' },
+                { emoji: '📍', chinese: '在哪裡', pinyin: 'zài nǎ lǐ', english: 'Where is' },
+                { emoji: '💰', chinese: '多少錢', pinyin: 'duō shǎo qián', english: 'How much' }
+            ]
+        };
+
+        let currentCategory = 'greetings';
+        let wordsPlayed = 0;
+        let currentStreak = 0;
+        let currentSpeaking = null;
+
+        // Game state variables
+        let currentMode = 'practice';
+        let currentGame = null;
+        let gameState = {};
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            setupModeToggle();
+            setupGameSelection();
+            displayWords(currentCategory);
+            updateStats();
+            updateTTSStatus();
+        });
+
+        // Mode toggle functionality
+        function setupModeToggle() {
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMode = this.dataset.mode;
+                    switchMode(currentMode);
+                });
+            });
+        }
+
+        function switchMode(mode) {
+            const practiceSection = document.getElementById('practiceSection');
+            const gamesSection = document.getElementById('gamesSection');
+            
+            if (mode === 'practice') {
+                practiceSection.classList.add('active');
+                gamesSection.classList.remove('active');
+                showGameSelection();
+            } else {
+                practiceSection.classList.remove('active');
+                gamesSection.classList.add('active');
+                showGameSelection();
+            }
+        }
+
+        // Game selection functionality
+        function setupGameSelection() {
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const gameType = this.dataset.game;
+                    startGame(gameType);
+                });
+            });
+        }
+
+        function showGameSelection() {
+            document.getElementById('gameSelection').style.display = 'grid';
+            document.querySelectorAll('.game-interface').forEach(interface => {
+                interface.classList.remove('active');
+            });
+            currentGame = null;
+        }
+
+        function startGame(gameType) {
+            currentGame = gameType;
+            document.getElementById('gameSelection').style.display = 'none';
+            
+            switch(gameType) {
+                case 'matching':
+                    startMatchingGame();
+                    break;
+                case 'quiz':
+                    startQuizGame();
+                    break;
+                case 'memory':
+                    startMemoryGame();
+                    break;
+                case 'speed':
+                    showSpeedGame();
+                    break;
+            }
+        }
+
+        // MATCHING GAME
+        function startMatchingGame() {
+            document.getElementById('matchingGame').classList.add('active');
+            gameState.matching = {
+                score: 0,
+                lives: 3,
+                currentQuestion: null,
+                correctAnswer: null,
+                questionIndex: 0
+            };
+            nextMatchingQuestion();
+        }
+
+        function nextMatchingQuestion() {
+            const allWords = Object.values(wordDatabase).flat();
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            
+            gameState.matching.currentQuestion = randomWord;
+            gameState.matching.correctAnswer = randomWord.english;
+            
+            document.getElementById('matchingQuestion').textContent = randomWord.chinese;
+            document.getElementById('matchingNext').style.display = 'none';
+            
+            // Create wrong answers
+            const wrongAnswers = allWords
+                .filter(w => w.english !== randomWord.english)
+                .map(w => w.english)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const allOptions = [randomWord.english, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('matchingOptions');
+            optionsContainer.innerHTML = '';
+            
+            allOptions.forEach(option => {
+                const optionCard = document.createElement('div');
+                optionCard.className = 'option-card';
+                optionCard.textContent = option;
+                optionCard.addEventListener('click', () => checkMatchingAnswer(option, optionCard));
+                optionsContainer.appendChild(optionCard);
+            });
+            
+            // Setup audio button
+            document.getElementById('matchingAudio').onclick = () => {
+                playGameWord(randomWord);
+            };
+            
+            updateMatchingScore();
+        }
+
+        function checkMatchingAnswer(selected, cardElement) {
+            const correct = selected === gameState.matching.correctAnswer;
+            
+            document.querySelectorAll('#matchingOptions .option-card').forEach(card => {
+                card.style.pointerEvents = 'none';
+                if (card.textContent === gameState.matching.correctAnswer) {
+                    card.classList.add('correct');
+                } else if (card === cardElement && !correct) {
+                    card.classList.add('incorrect');
+                }
+            });
+            
+            if (correct) {
+                gameState.matching.score += 10;
+                showCelebration('🎉');
+            } else {
+                gameState.matching.lives--;
+                showCelebration('😢');
+            }
+            
+            updateMatchingScore();
+            
+            if (gameState.matching.lives <= 0) {
+                setTimeout(() => {
+                    alert(`Game Over! Final Score: ${gameState.matching.score}`);
+                    showGameSelection();
+                }, 1500);
+            } else {
+                document.getElementById('matchingNext').style.display = 'block';
+            }
+        }
+
+        function updateMatchingScore() {
+            const hearts = '❤️'.repeat(gameState.matching.lives);
+            document.getElementById('matchingScore').textContent = 
+                `Score: ${gameState.matching.score} | Lives: ${hearts}`;
+        }
+
+        // QUIZ GAME
+        function startQuizGame() {
+            document.getElementById('quizGame').classList.add('active');
+            gameState.quiz = {
+                score: 0,
+                question: 1,
+                totalQuestions: 10,
+                currentWord: null
+            };
+            nextQuizQuestion();
+        }
+
+        function nextQuizQuestion() {
+            if (gameState.quiz.question > gameState.quiz.totalQuestions) {
+                alert(`Quiz Complete! Score: ${gameState.quiz.score}/${gameState.quiz.totalQuestions}`);
+                showGameSelection();
+                return;
+            }
+            
+            const allWords = Object.values(wordDatabase).flat();
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            gameState.quiz.currentWord = randomWord;
+            
+            document.getElementById('quizNext').style.display = 'none';
+            
+            // Setup audio (without emoji spoiler)
+            document.getElementById('quizAudio').onclick = () => {
+                playQuizAudio(randomWord);
+            };
+            
+            // Create options
+            const wrongAnswers = allWords
+                .filter(w => w.english !== randomWord.english)
+                .map(w => w.english)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const allOptions = [randomWord.english, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            allOptions.forEach(option => {
+                const optionCard = document.createElement('div');
+                optionCard.className = 'option-card';
+                optionCard.textContent = option;
+                optionCard.style.pointerEvents = 'auto'; // Reset pointer events
+                optionCard.addEventListener('click', () => checkQuizAnswer(option, optionCard));
+                optionsContainer.appendChild(optionCard);
+            });
+            
+            updateQuizScore();
+        }
+
+        function checkQuizAnswer(selected, cardElement) {
+            const correct = selected === gameState.quiz.currentWord.english;
+            
+            // Disable all options immediately
+            document.querySelectorAll('#quizOptions .option-card').forEach(card => {
+                card.style.pointerEvents = 'none';
+            });
+            
+            // Just highlight the selected answer first
+            cardElement.classList.add('selected');
+            
+            // After a short delay, show the results
+            setTimeout(() => {
+                document.querySelectorAll('#quizOptions .option-card').forEach(card => {
+                    if (card.textContent === gameState.quiz.currentWord.english) {
+                        card.classList.add('correct');
+                    } else if (card === cardElement && !correct) {
+                        card.classList.add('incorrect');
+                    }
+                });
+                
+                if (correct) {
+                    gameState.quiz.score++;
+                    showCelebration('🎉');
+                } else {
+                    showCelebration('😢');
+                }
+                
+                gameState.quiz.question++;
+                updateQuizScore();
+                document.getElementById('quizNext').style.display = 'block';
+            }, 800); // 800ms delay before showing results
+        }
+
+        function updateQuizScore() {
+            document.getElementById('quizScore').textContent = 
+                `Score: ${gameState.quiz.score} | Question: ${gameState.quiz.question}/${gameState.quiz.totalQuestions}`;
+        }
+
+        // MEMORY GAME
+        function startMemoryGame() {
+            document.getElementById('memoryGame').classList.add('active');
+            gameState.memory = {
+                pairsFound: 0,
+                moves: 0,
+                flippedCards: [],
+                pairs: []
+            };
+            generateMemoryGame();
+        }
+
+        function generateMemoryGame() {
+            const allWords = Object.values(wordDatabase).flat();
+            const selectedWords = allWords.sort(() => Math.random() - 0.5).slice(0, 8);
+            
+            const cards = [];
+            selectedWords.forEach(word => {
+                cards.push({ type: 'chinese', content: word.chinese, id: word.chinese + '_chinese', word: word });
+                cards.push({ type: 'english', content: word.english, id: word.chinese + '_english', word: word });
+            });
+            
+            gameState.memory.pairs = selectedWords.map(word => [word.chinese + '_chinese', word.chinese + '_english']);
+            cards.sort(() => Math.random() - 0.5);
+            
+            const memoryGrid = document.getElementById('memoryGrid');
+            memoryGrid.innerHTML = '';
+            
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'memory-card';
+                cardElement.dataset.id = card.id;
+                cardElement.innerHTML = '?';
+                cardElement.addEventListener('click', () => flipMemoryCard(cardElement, card));
+                memoryGrid.appendChild(cardElement);
+            });
+            
+            updateMemoryScore();
+        }
+
+        function flipMemoryCard(cardElement, card) {
+            if (cardElement.classList.contains('flipped') || cardElement.classList.contains('matched')) {
+                return;
+            }
+            
+            if (gameState.memory.flippedCards.length >= 2) {
+                return;
+            }
+            
+            cardElement.classList.add('flipped');
+            cardElement.innerHTML = card.content;
+            gameState.memory.flippedCards.push({ element: cardElement, card: card });
+            
+            if (gameState.memory.flippedCards.length === 2) {
+                gameState.memory.moves++;
+                setTimeout(checkMemoryMatch, 1000);
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [first, second] = gameState.memory.flippedCards;
+            const firstId = first.card.id.split('_')[0];
+            const secondId = second.card.id.split('_')[0];
+            
+            if (firstId === secondId) {
+                first.element.classList.add('matched');
+                second.element.classList.add('matched');
+                gameState.memory.pairsFound++;
+                showCelebration('🎉');
+                
+                if (gameState.memory.pairsFound === 8) {
+                    setTimeout(() => {
+                        alert(`Congratulations! You completed the memory game in ${gameState.memory.moves} moves!`);
+                    }, 500);
+                }
+            } else {
+                first.element.classList.remove('flipped');
+                second.element.classList.remove('flipped');
+                first.element.innerHTML = '?';
+                second.element.innerHTML = '?';
+            }
+            
+            gameState.memory.flippedCards = [];
+            updateMemoryScore();
+        }
+
+        function resetMemoryGame() {
+            gameState.memory = {
+                pairsFound: 0,
+                moves: 0,
+                flippedCards: [],
+                pairs: []
+            };
+            generateMemoryGame();
+        }
+
+        function updateMemoryScore() {
+            document.getElementById('memoryScore').textContent = 
+                `Pairs Found: ${gameState.memory.pairsFound}/8 | Moves: ${gameState.memory.moves}`;
+        }
+
+        // SPEED GAME
+        function showSpeedGame() {
+            document.getElementById('speedGame').classList.add('active');
+        }
+
+        function startSpeedGame() {
+            gameState.speed = {
+                score: 0,
+                streak: 0,
+                timeLeft: 60,
+                currentWord: null,
+                isPlaying: true
+            };
+            
+            document.getElementById('speedButtons').innerHTML = '';
+            document.getElementById('speedWord').textContent = '';
+            document.getElementById('speedAudio').style.display = 'block';
+            
+            const timer = setInterval(() => {
+                gameState.speed.timeLeft--;
+                document.getElementById('speedTimer').textContent = gameState.speed.timeLeft;
+                
+                if (gameState.speed.timeLeft <= 0) {
+                    clearInterval(timer);
+                    endSpeedGame();
+                }
+            }, 1000);
+            
+            nextSpeedQuestion();
+        }
+
+        function nextSpeedQuestion() {
+            if (!gameState.speed.isPlaying) return;
+            
+            const allWords = Object.values(wordDatabase).flat();
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            gameState.speed.currentWord = randomWord;
+            
+            document.getElementById('speedWord').textContent = randomWord.chinese;
+            document.getElementById('speedAudio').onclick = () => {
+                playGameWord(randomWord);
+            };
+            
+            // Create options
+            const wrongAnswers = allWords
+                .filter(w => w.english !== randomWord.english)
+                .map(w => w.english)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 2);
+            
+            const allOptions = [randomWord.english, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            const buttonsContainer = document.getElementById('speedButtons');
+            buttonsContainer.innerHTML = '';
+            
+            allOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'speed-btn';
+                button.textContent = option;
+                button.addEventListener('click', () => checkSpeedAnswer(option));
+                buttonsContainer.appendChild(button);
+            });
+            
+            updateSpeedScore();
+        }
+
+        function checkSpeedAnswer(selected) {
+            const correct = selected === gameState.speed.currentWord.english;
+            
+            if (correct) {
+                gameState.speed.score += 5;
+                gameState.speed.streak++;
+                showCelebration('⚡');
+            } else {
+                gameState.speed.streak = 0;
+                showCelebration('❌');
+            }
+            
+            updateSpeedScore();
+            setTimeout(nextSpeedQuestion, 500);
+        }
+
+        function endSpeedGame() {
+            gameState.speed.isPlaying = false;
+            alert(`Time's up! Final Score: ${gameState.speed.score} | Best Streak: ${gameState.speed.streak}`);
+            document.getElementById('speedButtons').innerHTML = '<button class="speed-btn" onclick="startSpeedGame()">🚀 Play Again</button>';
+            document.getElementById('speedAudio').style.display = 'none';
+            document.getElementById('speedWord').textContent = 'Game Over!';
+        }
+
+        function updateSpeedScore() {
+            document.getElementById('speedScore').textContent = 
+                `Score: ${gameState.speed.score} | Streak: ${gameState.speed.streak}`;
+        }
+
+        // Quiz audio function (no emoji spoiler)
+        function playQuizAudio(word) {
+            // Stop any current audio
+            if (currentSpeaking) {
+                const existingAudio = document.querySelector('audio[data-tts="true"]');
+                if (existingAudio) {
+                    existingAudio.pause();
+                    existingAudio.remove();
+                }
+                speechSynthesis.cancel();
+                currentSpeaking = null;
+            }
+
+            // NO emoji celebration for quiz (would spoil the answer!)
+
+            // Create audio element with Google Translate TTS
+            const audio = document.createElement('audio');
+            audio.setAttribute('data-tts', 'true');
+            
+            // Multiple free TTS endpoints for reliability
+            const ttsUrls = [
+                // Google Translate TTS (Taiwan Chinese)
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-TW&client=tw-ob`,
+                // Backup: Mainland Chinese
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-CN&client=tw-ob`,
+                // ResponsiveVoice fallback
+                `https://responsivevoice.org/responsivevoice/getvoice.php?t=${encodeURIComponent(word.chinese)}&tl=Chinese%20Female&sv=&vn=&pitch=0.5&rate=0.5&vol=1`
+            ];
+
+            let urlIndex = 0;
+
+            function tryNextURL() {
+                if (urlIndex < ttsUrls.length) {
+                    audio.src = ttsUrls[urlIndex];
+                    urlIndex++;
+                } else {
+                    // All external services failed, fallback to device TTS
+                    console.log('External TTS failed, using fallback for quiz');
+                    playQuizAudioFallback(word);
+                    return;
+                }
+            }
+
+            // Set up audio events
+            audio.oncanplaythrough = function() {
+                console.log(`Playing Chinese TTS for quiz: ${word.chinese}`);
+                audio.play().catch(e => {
+                    console.log('Quiz audio play failed, trying next URL');
+                    tryNextURL();
+                });
+            };
+
+            audio.onended = function() {
+                currentSpeaking = null;
+                audio.remove();
+            };
+
+            audio.onerror = function() {
+                console.log('Quiz TTS URL failed, trying next option');
+                tryNextURL();
+            };
+
+            // Start with first URL
+            tryNextURL();
+
+            // Append to body (required for some browsers)
+            document.body.appendChild(audio);
+        }
+
+        // Quiz fallback TTS (no emoji spoiler)
+        function playQuizAudioFallback(word) {
+            console.log('Using enhanced fallback TTS for quiz');
+            
+            const utterance = new SpeechSynthesisUtterance(word.chinese);
+            
+            // Force Chinese pronunciation with multiple language attempts
+            const chineseLanguages = ['zh-TW', 'zh-CN', 'zh-HK', 'zh'];
+            let langIndex = 0;
+
+            function tryNextLanguage() {
+                if (langIndex < chineseLanguages.length) {
+                    utterance.lang = chineseLanguages[langIndex];
+                    langIndex++;
+                    
+                    utterance.rate = 0.7;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+
+                    utterance.onend = function() {
+                        currentSpeaking = null;
+                    };
+
+                    utterance.onerror = function(e) {
+                        if (e.error === 'language-not-supported' && langIndex < chineseLanguages.length) {
+                            console.log(`Language ${utterance.lang} not supported for quiz, trying next...`);
+                            tryNextLanguage();
+                        } else {
+                            console.log('All language options exhausted for quiz');
+                            currentSpeaking = null;
+                        }
+                    };
+
+                    speechSynthesis.speak(utterance);
+                }
+            }
+
+            tryNextLanguage();
+        }
+
+        // Game utility functions (with emoji celebration)
+        function playGameWord(word) {
+            // Stop any current audio
+            if (currentSpeaking) {
+                const existingAudio = document.querySelector('audio[data-tts="true"]');
+                if (existingAudio) {
+                    existingAudio.pause();
+                    existingAudio.remove();
+                }
+                speechSynthesis.cancel();
+                currentSpeaking = null;
+            }
+
+            // Add celebration effect for games (not quiz)
+            showCelebration(word.emoji);
+
+            // Create audio element with Google Translate TTS
+            const audio = document.createElement('audio');
+            audio.setAttribute('data-tts', 'true');
+            
+            // Multiple free TTS endpoints for reliability
+            const ttsUrls = [
+                // Google Translate TTS (Taiwan Chinese)
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-TW&client=tw-ob`,
+                // Backup: Mainland Chinese
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-CN&client=tw-ob`,
+                // ResponsiveVoice fallback
+                `https://responsivevoice.org/responsivevoice/getvoice.php?t=${encodeURIComponent(word.chinese)}&tl=Chinese%20Female&sv=&vn=&pitch=0.5&rate=0.5&vol=1`
+            ];
+
+            let urlIndex = 0;
+
+            function tryNextURL() {
+                if (urlIndex < ttsUrls.length) {
+                    audio.src = ttsUrls[urlIndex];
+                    urlIndex++;
+                } else {
+                    // All external services failed, fallback to device TTS
+                    console.log('External TTS failed, using fallback for games');
+                    playGameWordFallback(word);
+                    return;
+                }
+            }
+
+            // Set up audio events
+            audio.oncanplaythrough = function() {
+                console.log(`Playing Chinese TTS for game: ${word.chinese}`);
+                audio.play().catch(e => {
+                    console.log('Game audio play failed, trying next URL');
+                    tryNextURL();
+                });
+            };
+
+            audio.onended = function() {
+                currentSpeaking = null;
+                audio.remove();
+            };
+
+            audio.onerror = function() {
+                console.log('Game TTS URL failed, trying next option');
+                tryNextURL();
+            };
+
+            // Start with first URL
+            tryNextURL();
+
+            // Append to body (required for some browsers)
+            document.body.appendChild(audio);
+        }
+
+        // Fallback TTS for games only
+        function playGameWordFallback(word) {
+            console.log('Using enhanced fallback TTS for games');
+            
+            const utterance = new SpeechSynthesisUtterance(word.chinese);
+            
+            // Force Chinese pronunciation with multiple language attempts
+            const chineseLanguages = ['zh-TW', 'zh-CN', 'zh-HK', 'zh'];
+            let langIndex = 0;
+
+            function tryNextLanguage() {
+                if (langIndex < chineseLanguages.length) {
+                    utterance.lang = chineseLanguages[langIndex];
+                    langIndex++;
+                    
+                    utterance.rate = 0.7;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+
+                    utterance.onend = function() {
+                        currentSpeaking = null;
+                    };
+
+                    utterance.onerror = function(e) {
+                        if (e.error === 'language-not-supported' && langIndex < chineseLanguages.length) {
+                            console.log(`Language ${utterance.lang} not supported for games, trying next...`);
+                            tryNextLanguage();
+                        } else {
+                            console.log('All language options exhausted for games');
+                            currentSpeaking = null;
+                        }
+                    };
+
+                    speechSynthesis.speak(utterance);
+                }
+            }
+
+            tryNextLanguage();
+        }
+
+        function updateTTSStatus() {
+            const ttsStatus = document.getElementById('ttsStatus');
+            ttsStatus.innerHTML = '✅ Free Chinese TTS Active! Perfect pronunciation guaranteed! 🎯';
+            ttsStatus.style.borderColor = '#00d4aa';
+        }
+
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.dataset.category;
+                    displayWords(currentCategory);
+                    updateStats();
+                });
+            });
+        }
+
+        function displayWords(category) {
+            const wordGrid = document.getElementById('wordGrid');
+            const words = wordDatabase[category];
+            
+            wordGrid.innerHTML = '';
+            
+            words.forEach((word, index) => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.innerHTML = `
+                    <span class="word-emoji">${word.emoji}</span>
+                    <div class="word-chinese">${word.chinese}</div>
+                    <div class="word-pinyin">${word.pinyin}</div>
+                    <div class="word-english">${word.english}</div>
+                `;
+                
+                wordCard.addEventListener('click', () => playWord(word, wordCard));
+                wordGrid.appendChild(wordCard);
+            });
+        }
+
+        // Free external Chinese TTS using Google Translate
+        function playWord(word, cardElement) {
+            // Stop any current audio
+            if (currentSpeaking) {
+                const existingAudio = document.querySelector('audio[data-tts="true"]');
+                if (existingAudio) {
+                    existingAudio.pause();
+                    existingAudio.remove();
+                }
+                if (currentSpeaking.classList) {
+                    currentSpeaking.classList.remove('playing');
+                }
+            }
+
+            // Visual feedback (only if cardElement exists)
+            if (cardElement && cardElement.classList) {
+                cardElement.classList.add('playing');
+                currentSpeaking = cardElement;
+            } else {
+                currentSpeaking = null;
+            }
+
+            // Add celebration effect
+            showCelebration(word.emoji);
+
+            // Create audio element with Google Translate TTS
+            const audio = document.createElement('audio');
+            audio.setAttribute('data-tts', 'true');
+            
+            // Multiple free TTS endpoints for reliability
+            const ttsUrls = [
+                // Google Translate TTS (Taiwan Chinese)
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-TW&client=tw-ob`,
+                // Backup: Mainland Chinese
+                `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word.chinese)}&tl=zh-CN&client=tw-ob`,
+                // ResponsiveVoice fallback
+                `https://responsivevoice.org/responsivevoice/getvoice.php?t=${encodeURIComponent(word.chinese)}&tl=Chinese%20Female&sv=&vn=&pitch=0.5&rate=0.5&vol=1`
+            ];
+
+            let urlIndex = 0;
+
+            function tryNextURL() {
+                if (urlIndex < ttsUrls.length) {
+                    audio.src = ttsUrls[urlIndex];
+                    urlIndex++;
+                } else {
+                    // All external services failed, fallback to device TTS with proper Chinese
+                    console.log('External TTS failed, using fallback');
+                    playWordFallback(word, cardElement);
+                    return;
+                }
+            }
+
+            // Set up audio events
+            audio.oncanplaythrough = function() {
+                console.log(`Playing Chinese TTS: ${word.chinese} from external service`);
+                audio.play().catch(e => {
+                    console.log('Audio play failed, trying next URL');
+                    tryNextURL();
+                });
+            };
+
+            audio.onended = function() {
+                if (cardElement && cardElement.classList) {
+                    cardElement.classList.remove('playing');
+                }
+                currentSpeaking = null;
+                wordsPlayed++;
+                currentStreak++;
+                updateStats();
+                audio.remove();
+            };
+
+            audio.onerror = function() {
+                console.log('TTS URL failed, trying next option');
+                tryNextURL();
+            };
+
+            // Start with first URL
+            tryNextURL();
+
+            // Append to body (required for some browsers)
+            document.body.appendChild(audio);
+        }
+
+        // Enhanced fallback with proper Chinese language forcing
+        function playWordFallback(word, cardElement) {
+            console.log('Using enhanced fallback TTS');
+            
+            const utterance = new SpeechSynthesisUtterance(word.chinese);
+            
+            // Force Chinese pronunciation with multiple language attempts
+            const chineseLanguages = ['zh-TW', 'zh-CN', 'zh-HK', 'zh'];
+            let langIndex = 0;
+
+            function tryNextLanguage() {
+                if (langIndex < chineseLanguages.length) {
+                    utterance.lang = chineseLanguages[langIndex];
+                    langIndex++;
+                    
+                    utterance.rate = 0.7;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+
+                    utterance.onend = function() {
+                        if (cardElement && cardElement.classList) {
+                            cardElement.classList.remove('playing');
+                        }
+                        currentSpeaking = null;
+                        wordsPlayed++;
+                        currentStreak++;
+                        updateStats();
+                    };
+
+                    utterance.onerror = function(e) {
+                        if (e.error === 'language-not-supported' && langIndex < chineseLanguages.length) {
+                            console.log(`Language ${utterance.lang} not supported, trying next...`);
+                            tryNextLanguage();
+                        } else {
+                            console.log('All language options exhausted');
+                            if (cardElement && cardElement.classList) {
+                                cardElement.classList.remove('playing');
+                            }
+                            currentSpeaking = null;
+                        }
+                    };
+
+                    speechSynthesis.speak(utterance);
+                }
+            }
+
+            tryNextLanguage();
+        }
+
+        function showCelebration(emoji) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            document.body.appendChild(celebration);
+
+            setTimeout(() => {
+                if (document.body.contains(celebration)) {
+                    document.body.removeChild(celebration);
+                }
+            }, 1000);
+        }
+
+        function updateStats() {
+            const totalWords = Object.values(wordDatabase).reduce((total, category) => total + category.length, 0);
+            document.getElementById('totalWords').textContent = totalWords;
+            document.getElementById('wordsPlayed').textContent = wordsPlayed;
+            document.getElementById('currentStreak').textContent = currentStreak;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && currentSpeaking) {
+                const existingAudio = document.querySelector('audio[data-tts="true"]');
+                if (existingAudio) {
+                    existingAudio.pause();
+                    existingAudio.remove();
+                }
+                speechSynthesis.cancel();
+                if (currentSpeaking && currentSpeaking.classList) {
+                    currentSpeaking.classList.remove('playing');
+                }
+                currentSpeaking = null;
+            }
+        });
+
+        // Prevent double-tap zoom on mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html> 
