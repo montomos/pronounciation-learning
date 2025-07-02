@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLLAMA - Taiwan Travel Chinese for Kids (8歳)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 75%, #fdf2b3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: bgShift 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 75%, #fdf2b3 100%); }
+            100% { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 25%, #fed6e3 75%, #ffe8d6 100%); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 3px solid #ff6b6b;
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            transform: scale(1.05);
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .word-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .word-card:hover::before {
+            animation: shine 0.6s ease-in-out;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #ff6b6b;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .word-card.playing {
+            animation: pulse 0.6s ease-in-out;
+            border-color: #00d4aa;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .word-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .word-chinese {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+        }
+
+        .word-pinyin {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .word-english {
+            font-size: 0.85rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 3px solid #4ecdc4;
+        }
+
+        .stats-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .stats-content {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            z-index: 1000;
+            pointer-events: none;
+            animation: celebrate 1s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2.2rem; }
+            .word-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+            .word-card { padding: 15px; }
+            .word-emoji { font-size: 2rem; }
+            .word-chinese { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">OLLAMA Kids</h1>
+            <p class="subtitle">🇹🇼 Taiwan Travel Chinese for 8-Year-Olds! 🎉</p>
+        </div>
+
+        <div class="welcome-section">
+            <div class="welcome-text">
+                🌟 Click any button to hear Chinese words! Perfect for kids traveling to Taiwan! 🌟
+            </div>
+            <div class="welcome-text">
+                🎯 點任何按鈕聽中文發音！8歲小朋友台灣旅行必備！
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab-btn active" data-category="greetings">👋 Greetings</button>
+            <button class="tab-btn" data-category="food">🍜 Food</button>
+            <button class="tab-btn" data-category="family">👨‍👩‍👧‍👦 Family</button>
+            <button class="tab-btn" data-category="numbers">🔢 Numbers</button>
+            <button class="tab-btn" data-category="colors">🌈 Colors</button>
+            <button class="tab-btn" data-category="animals">🐻 Animals</button>
+            <button class="tab-btn" data-category="emotions">😊 Feelings</button>
+            <button class="tab-btn" data-category="travel">✈️ Travel</button>
+        </div>
+
+        <div class="word-grid" id="wordGrid">
+            <!-- Words will be populated by JavaScript -->
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title">🏆 Your Learning Progress! 學習進度！</div>
+            <div class="stats-content">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalWords">0</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="wordsPlayed">0</div>
+                    <div class="stat-label">Words Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="currentStreak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Word database for 8-year-old kids traveling to Taiwan
+        const wordDatabase = {
+            greetings: [
+                { emoji: '👋', chinese: '你好', pinyin: 'nǐ hǎo', english: 'Hello' },
+                { emoji: '🌅', chinese: '早安', pinyin: 'zǎo ān', english: 'Good morning' },
+                { emoji: '🌙', chinese: '晚安', pinyin: 'wǎn ān', english: 'Good night' },
+                { emoji: '🙏', chinese: '謝謝', pinyin: 'xiè xiè', english: 'Thank you' },
+                { emoji: '🙇‍♂️', chinese: '對不起', pinyin: 'duì bù qǐ', english: 'Sorry' },
+                { emoji: '👋', chinese: '再見', pinyin: 'zài jiàn', english: 'Goodbye' },
+                { emoji: '🤝', chinese: '請', pinyin: 'qǐng', english: 'Please' },
+                { emoji: '😊', chinese: '不客氣', pinyin: 'bù kè qì', english: 'You\'re welcome' }
+            ],
+            food: [
+                { emoji: '🍜', chinese: '麵', pinyin: 'miàn', english: 'Noodles' },
+                { emoji: '🍚', chinese: '飯', pinyin: 'fàn', english: 'Rice' },
+                { emoji: '🥟', chinese: '餃子', pinyin: 'jiǎo zi', english: 'Dumplings' },
+                { emoji: '🧋', chinese: '珍珠奶茶', pinyin: 'zhēn zhū nǎi chá', english: 'Bubble tea' },
+                { emoji: '🍎', chinese: '蘋果', pinyin: 'píng guǒ', english: 'Apple' },
+                { emoji: '🍌', chinese: '香蕉', pinyin: 'xiāng jiāo', english: 'Banana' },
+                { emoji: '🥛', chinese: '牛奶', pinyin: 'niú nǎi', english: 'Milk' },
+                { emoji: '🍪', chinese: '餅乾', pinyin: 'bǐng gān', english: 'Cookies' },
+                { emoji: '🍦', chinese: '冰淇淋', pinyin: 'bīng qí lín', english: 'Ice cream' },
+                { emoji: '💧', chinese: '水', pinyin: 'shuǐ', english: 'Water' }
+            ],
+            family: [
+                { emoji: '👨', chinese: '爸爸', pinyin: 'bà ba', english: 'Daddy' },
+                { emoji: '👩', chinese: '媽媽', pinyin: 'mā ma', english: 'Mommy' },
+                { emoji: '👦', chinese: '哥哥', pinyin: 'gē ge', english: 'Big brother' },
+                { emoji: '👧', chinese: '姐姐', pinyin: 'jiě jie', english: 'Big sister' },
+                { emoji: '👶', chinese: '弟弟', pinyin: 'dì di', english: 'Little brother' },
+                { emoji: '👶', chinese: '妹妹', pinyin: 'mèi mei', english: 'Little sister' },
+                { emoji: '👴', chinese: '爺爺', pinyin: 'yé ye', english: 'Grandpa' },
+                { emoji: '👵', chinese: '奶奶', pinyin: 'nǎi nai', english: 'Grandma' }
+            ],
+            numbers: [
+                { emoji: '1️⃣', chinese: '一', pinyin: 'yī', english: 'One' },
+                { emoji: '2️⃣', chinese: '二', pinyin: 'èr', english: 'Two' },
+                { emoji: '3️⃣', chinese: '三', pinyin: 'sān', english: 'Three' },
+                { emoji: '4️⃣', chinese: '四', pinyin: 'sì', english: 'Four' },
+                { emoji: '5️⃣', chinese: '五', pinyin: 'wǔ', english: 'Five' },
+                { emoji: '6️⃣', chinese: '六', pinyin: 'liù', english: 'Six' },
+                { emoji: '7️⃣', chinese: '七', pinyin: 'qī', english: 'Seven' },
+                { emoji: '8️⃣', chinese: '八', pinyin: 'bā', english: 'Eight' },
+                { emoji: '9️⃣', chinese: '九', pinyin: 'jiǔ', english: 'Nine' },
+                { emoji: '🔟', chinese: '十', pinyin: 'shí', english: 'Ten' }
+            ],
+            colors: [
+                { emoji: '🔴', chinese: '紅色', pinyin: 'hóng sè', english: 'Red' },
+                { emoji: '🟡', chinese: '黃色', pinyin: 'huáng sè', english: 'Yellow' },
+                { emoji: '🔵', chinese: '藍色', pinyin: 'lán sè', english: 'Blue' },
+                { emoji: '🟢', chinese: '綠色', pinyin: 'lǜ sè', english: 'Green' },
+                { emoji: '🟣', chinese: '紫色', pinyin: 'zǐ sè', english: 'Purple' },
+                { emoji: '🟠', chinese: '橙色', pinyin: 'chéng sè', english: 'Orange' },
+                { emoji: '⚫', chinese: '黑色', pinyin: 'hēi sè', english: 'Black' },
+                { emoji: '⚪', chinese: '白色', pinyin: 'bái sè', english: 'White' }
+            ],
+            animals: [
+                { emoji: '🐶', chinese: '狗', pinyin: 'gǒu', english: 'Dog' },
+                { emoji: '🐱', chinese: '貓', pinyin: 'māo', english: 'Cat' },
+                { emoji: '🐻', chinese: '熊', pinyin: 'xióng', english: 'Bear' },
+                { emoji: '🐰', chinese: '兔子', pinyin: 'tù zi', english: 'Rabbit' },
+                { emoji: '🐸', chinese: '青蛙', pinyin: 'qīng wā', english: 'Frog' },
+                { emoji: '🐦', chinese: '鳥', pinyin: 'niǎo', english: 'Bird' },
+                { emoji: '🐟', chinese: '魚', pinyin: 'yú', english: 'Fish' },
+                { emoji: '🐘', chinese: '大象', pinyin: 'dà xiàng', english: 'Elephant' }
+            ],
+            emotions: [
+                { emoji: '😊', chinese: '開心', pinyin: 'kāi xīn', english: 'Happy' },
+                { emoji: '😢', chinese: '難過', pinyin: 'nán guò', english: 'Sad' },
+                { emoji: '😡', chinese: '生氣', pinyin: 'shēng qì', english: 'Angry' },
+                { emoji: '😴', chinese: '累', pinyin: 'lèi', english: 'Tired' },
+                { emoji: '😋', chinese: '餓', pinyin: 'è', english: 'Hungry' },
+                { emoji: '😵', chinese: '渴', pinyin: 'kě', english: 'Thirsty' },
+                { emoji: '🤒', chinese: '不舒服', pinyin: 'bù shū fú', english: 'Sick' },
+                { emoji: '😍', chinese: '喜歡', pinyin: 'xǐ huān', english: 'Like/Love' }
+            ],
+            travel: [
+                { emoji: '🚻', chinese: '廁所', pinyin: 'cè suǒ', english: 'Toilet' },
+                { emoji: '🏨', chinese: '飯店', pinyin: 'fàn diàn', english: 'Hotel' },
+                { emoji: '🚕', chinese: '計程車', pinyin: 'jì chéng chē', english: 'Taxi' },
+                { emoji: '🚇', chinese: '捷運', pinyin: 'jié yùn', english: 'MRT' },
+                { emoji: '🏪', chinese: '便利商店', pinyin: 'biàn lì shāng diàn', english: 'Convenience store' },
+                { emoji: '🆘', chinese: '幫忙', pinyin: 'bāng máng', english: 'Help' },
+                { emoji: '📍', chinese: '在哪裡', pinyin: 'zài nǎ lǐ', english: 'Where is' },
+                { emoji: '💰', chinese: '多少錢', pinyin: 'duō shǎo qián', english: 'How much' }
+            ]
+        };
+
+        let currentCategory = 'greetings';
+        let wordsPlayed = 0;
+        let currentStreak = 0;
+        let currentSpeaking = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            displayWords(currentCategory);
+            updateStats();
+        });
+
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Switch category
+                    currentCategory = this.dataset.category;
+                    displayWords(currentCategory);
+                    updateStats();
+                });
+            });
+        }
+
+        function displayWords(category) {
+            const wordGrid = document.getElementById('wordGrid');
+            const words = wordDatabase[category];
+            
+            wordGrid.innerHTML = '';
+            
+            words.forEach((word, index) => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.innerHTML = `
+                    <span class="word-emoji">${word.emoji}</span>
+                    <div class="word-chinese">${word.chinese}</div>
+                    <div class="word-pinyin">${word.pinyin}</div>
+                    <div class="word-english">${word.english}</div>
+                `;
+                
+                wordCard.addEventListener('click', () => playWord(word, wordCard));
+                wordGrid.appendChild(wordCard);
+            });
+        }
+
+        function playWord(word, cardElement) {
+            // Stop any current speech
+            if (currentSpeaking) {
+                speechSynthesis.cancel();
+                currentSpeaking.classList.remove('playing');
+            }
+
+            // Create speech utterance
+            const utterance = new SpeechSynthesisUtterance(word.chinese);
+            utterance.lang = 'zh-TW'; // Taiwan Chinese
+            utterance.rate = 0.8; // Slower for kids
+            utterance.pitch = 1.1; // Slightly higher pitch for kids
+            utterance.volume = 1;
+
+            // Visual feedback
+            cardElement.classList.add('playing');
+            currentSpeaking = cardElement;
+
+            // Add celebration effect
+            showCelebration(word.emoji);
+
+            // Speech events
+            utterance.onend = function() {
+                cardElement.classList.remove('playing');
+                currentSpeaking = null;
+                wordsPlayed++;
+                currentStreak++;
+                updateStats();
+            };
+
+            utterance.onerror = function() {
+                cardElement.classList.remove('playing');
+                currentSpeaking = null;
+                console.log('Speech error for: ' + word.chinese);
+            };
+
+            // Play the speech
+            speechSynthesis.speak(utterance);
+        }
+
+        function showCelebration(emoji) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            document.body.appendChild(celebration);
+
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 1000);
+        }
+
+        function updateStats() {
+            const totalWords = Object.values(wordDatabase).reduce((total, category) => total + category.length, 0);
+            document.getElementById('totalWords').textContent = totalWords;
+            document.getElementById('wordsPlayed').textContent = wordsPlayed;
+            document.getElementById('currentStreak').textContent = currentStreak;
+        }
+
+        // Keyboard shortcuts for kids
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && currentSpeaking) {
+                speechSynthesis.cancel();
+                currentSpeaking.classList.remove('playing');
+                currentSpeaking = null;
+            }
+        });
+
+        // Prevent double-tap zoom on mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html> 
